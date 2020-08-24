@@ -1,0 +1,176 @@
+Sub purchaseorders()
+
+'variables para conteo
+Dim itemcount As Integer
+Dim itemmax As Integer
+Const startrow As Integer = 12
+
+Set objsheet = ActiveWorkbook.ActiveSheet
+
+itemmax = objsheet.Range("A12:A50").Count - Range("A12:A50").SpecialCells(xlCellTypeBlanks).Count
+itemcount = 0
+    
+If itemmax = objsheet.Range("K12:K50").Count - Range("K12:K50").SpecialCells(xlCellTypeBlanks).Count Then
+   MsgBox "No hay ordenes de compra para ser creadas"
+   Exit Sub
+End If
+      
+ 'dimensiones de variables declaradas
+Dim application, connection, session
+Set objsheet = ActiveWorkbook.ActiveSheet
+
+'conexion sap
+If Not IsObject(application) Then
+   Set SapGuiAuto = GetObject("SAPGUI")
+   Set application = SapGuiAuto.GetScriptingEngine
+End If
+If Not IsObject(connection) Then
+   Set connection = application.Children(0)
+End If
+If Not IsObject(session) Then
+   Set session = connection.Children(0)
+End If
+If IsObject(WScript) Then
+   WScript.ConnectObject session, "on"
+   WScript.ConnectObject application, "on"
+End If
+      
+'update el contador en la celda
+objsheet.Cells(9, 1) = itemcount & " /// " & itemmax
+ 
+'ciclo atraves de las filas  y llama la funcion para crear
+For irow = startrow To itemmax + startrow - 1
+        If IsEmpty(objsheet.Cells(irow, 9).Value) Then
+                Dim ceco, centro, valor, rut, sucursal, dato, O
+                
+                valor = objsheet.Cells(irow, 6)
+                
+                rut = objsheet.Cells(irow, 8)
+                dato = objsheet.Cells(irow, 5)
+                sucursal = objsheet.Cells(irow, 4)
+                
+                'determina cecos y centros para DyP
+                
+                O = "1100"
+                oc = "1104"
+                
+         
+                
+                If sucursal = "QUILICURA" Then
+                    ceco = "11070280"
+                    centro = "1182"
+                End If
+                
+                If sucursal = "RANCAGUA" Then
+                    ceco = "11030180"
+                    centro = "1130"
+                End If
+                
+                If sucursal = "CURICO" Then
+                    ceco = "11030280"
+                    centro = "1131"
+                End If
+                
+                If sucursal = "TALCA" Then
+                    ceco = "11030380"
+                    centro = "1132"
+                End If
+                
+                If sucursal = "CHILLAN" Then
+                    ceco = "11040380"
+                    centro = "1140"
+                End If
+                
+                If sucursal = "CONCEPCIÓN" Then
+                    ceco = "11040180"
+                    centro = "1141"
+                End If
+                
+                If sucursal = "LOSANGELES" Then
+                    ceco = "11050180"
+                    centro = "1150"
+                End If
+                
+                If sucursal = "TEMUCO" Then
+                    ceco = "11050280"
+                    centro = "1151"
+                End If
+                
+                If sucursal = "VALDIVIA" Then
+                    ceco = "11050380"
+                    centro = "1152"
+                End If
+                
+                If sucursal = "OSORNO" Then
+                    ceco = "11060180"
+                    centro = "1160"
+                End If
+                
+
+                
+                
+                'determina rut de proveedor
+                session.findById("wnd[0]/tbar[0]/okcd").Text = "/nME21N"
+                session.findById("wnd[0]").sendVKey 0
+                session.findById("wnd[0]/usr/subSUB0:SAPLMEGUI:0016/subSUB0:SAPLMEGUI:0030/subSUB1:SAPLMEGUI:1105/ctxtMEPO_TOPLINE-SUPERFIELD").Text = rut
+                session.findById("wnd[0]").sendVKey 0
+                session.findById("wnd[0]/usr/subSUB0:SAPLMEGUI:0013/subSUB1:SAPLMEVIEWS:1100/subSUB2:SAPLMEVIEWS:1200/subSUB1:SAPLMEGUI:1102/tabsHEADER_DETAIL/tabpTABHDT10/ssubTABSTRIPCONTROL2SUB:SAPLMEGUI:1221/ctxtMEPO1222-EKORG").Text = oc
+                session.findById("wnd[0]/usr/subSUB0:SAPLMEGUI:0013/subSUB1:SAPLMEVIEWS:1100/subSUB2:SAPLMEVIEWS:1200/subSUB1:SAPLMEGUI:1102/tabsHEADER_DETAIL/tabpTABHDT10/ssubTABSTRIPCONTROL2SUB:SAPLMEGUI:1221/ctxtMEPO1222-EKGRP").Text = "CSC"
+                session.findById("wnd[0]/usr/subSUB0:SAPLMEGUI:0013/subSUB1:SAPLMEVIEWS:1100/subSUB2:SAPLMEVIEWS:1200/subSUB1:SAPLMEGUI:1102/tabsHEADER_DETAIL/tabpTABHDT10/ssubTABSTRIPCONTROL2SUB:SAPLMEGUI:1221/ctxtMEPO1222-BUKRS").Text = O
+                session.findById("wnd[0]/usr/subSUB0:SAPLMEGUI:0013/subSUB1:SAPLMEVIEWS:1100/subSUB2:SAPLMEVIEWS:1200/subSUB1:SAPLMEGUI:1102/tabsHEADER_DETAIL/tabpTABHDT10/ssubTABSTRIPCONTROL2SUB:SAPLMEGUI:1221/ctxtMEPO1222-BUKRS").SetFocus
+                session.findById("wnd[0]/usr/subSUB0:SAPLMEGUI:0013/subSUB1:SAPLMEVIEWS:1100/subSUB2:SAPLMEVIEWS:1200/subSUB1:SAPLMEGUI:1102/tabsHEADER_DETAIL/tabpTABHDT10/ssubTABSTRIPCONTROL2SUB:SAPLMEGUI:1221/ctxtMEPO1222-BUKRS").caretPosition = 4
+                session.findById("wnd[0]").sendVKey 0
+                session.findById("wnd[0]/usr/subSUB0:SAPLMEGUI:0013/subSUB2:SAPLMEVIEWS:1100/subSUB2:SAPLMEVIEWS:1200/subSUB1:SAPLMEGUI:1211/tblSAPLMEGUITC_1211/ctxtMEPO1211-KNTTP[2,0]").Text = "K"
+                session.findById("wnd[0]/usr/subSUB0:SAPLMEGUI:0013/subSUB2:SAPLMEVIEWS:1100/subSUB2:SAPLMEVIEWS:1200/subSUB1:SAPLMEGUI:1211/tblSAPLMEGUITC_1211/ctxtMEPO1211-EPSTP[3,0]").Text = "F"
+                session.findById("wnd[0]/usr/subSUB0:SAPLMEGUI:0013/subSUB2:SAPLMEVIEWS:1100/subSUB2:SAPLMEVIEWS:1200/subSUB1:SAPLMEGUI:1211/tblSAPLMEGUITC_1211/txtMEPO1211-TXZ01[5,0]").Text = dato
+                session.findById("wnd[0]/usr/subSUB0:SAPLMEGUI:0013/subSUB2:SAPLMEVIEWS:1100/subSUB2:SAPLMEVIEWS:1200/subSUB1:SAPLMEGUI:1211/tblSAPLMEGUITC_1211/txtMEPO1211-TXZ01[5,0]").SetFocus
+                session.findById("wnd[0]/usr/subSUB0:SAPLMEGUI:0013/subSUB2:SAPLMEVIEWS:1100/subSUB2:SAPLMEVIEWS:1200/subSUB1:SAPLMEGUI:1211/tblSAPLMEGUITC_1211/txtMEPO1211-TXZ01[5,0]").caretPosition = 40
+                'session.findById("wnd[0]").sendVKey 0
+                session.findById("wnd[0]/usr/subSUB0:SAPLMEGUI:0013/subSUB2:SAPLMEVIEWS:1100/subSUB2:SAPLMEVIEWS:1200/subSUB1:SAPLMEGUI:1211/tblSAPLMEGUITC_1211/ctxtMEPO1211-NAME1[15,0]").Text = centro
+                'session.findById("wnd[0]").sendVKey 0
+                session.findById("wnd[0]/usr/subSUB0:SAPLMEGUI:0013/subSUB2:SAPLMEVIEWS:1100/subSUB2:SAPLMEVIEWS:1200/subSUB1:SAPLMEGUI:1211/tblSAPLMEGUITC_1211/ctxtMEPO1211-WGBEZ[14,0]").Text = "000001000"
+                session.findById("wnd[0]").sendVKey 0
+                session.findById("wnd[0]").sendVKey 0
+                'este codigo es para servicios informaticos
+                session.findById("wnd[0]/usr/subSUB0:SAPLMEGUI:0019/subSUB3:SAPLMEVIEWS:1100/subSUB2:SAPLMEVIEWS:1200/subSUB1:SAPLMEGUI:1301/subSUB2:SAPLMEGUI:1303/tabsITEM_DETAIL/tabpTABIDT1/ssubTABSTRIPCONTROL1SUB:SAPLMEGUI:1328/subSUB0:SAPLMLSP:0400/tblSAPLMLSPTC_VIEW/ctxtESLL-SRVPOS[2,0]").Text = "3000056"
+                'este codigo es para mantenciones
+                'session.findById("wnd[0]/usr/subSUB0:SAPLMEGUI:0019/subSUB3:SAPLMEVIEWS:1100/subSUB2:SAPLMEVIEWS:1200/subSUB1:SAPLMEGUI:1301/subSUB2:SAPLMEGUI:1303/tabsITEM_DETAIL/tabpTABIDT1/ssubTABSTRIPCONTROL1SUB:SAPLMEGUI:1328/subSUB0:SAPLMLSP:0400/tblSAPLMLSPTC_VIEW/ctxtESLL-SRVPOS[2,0]").Text = "3000025"
+                
+                session.findById("wnd[0]/usr/subSUB0:SAPLMEGUI:0019/subSUB3:SAPLMEVIEWS:1100/subSUB2:SAPLMEVIEWS:1200/subSUB1:SAPLMEGUI:1301/subSUB2:SAPLMEGUI:1303/tabsITEM_DETAIL/tabpTABIDT1/ssubTABSTRIPCONTROL1SUB:SAPLMEGUI:1328/subSUB0:SAPLMLSP:0400/tblSAPLMLSPTC_VIEW/ctxtESLL-SRVPOS[2,0]").SetFocus
+                session.findById("wnd[0]").sendVKey 0
+                session.findById("wnd[0]/usr/subSUB0:SAPLMEGUI:0019/subSUB3:SAPLMEVIEWS:1100/subSUB2:SAPLMEVIEWS:1200/subSUB1:SAPLMEGUI:1301/subSUB2:SAPLMEGUI:1303/tabsITEM_DETAIL/tabpTABIDT1/ssubTABSTRIPCONTROL1SUB:SAPLMEGUI:1328/subSUB0:SAPLMLSP:0400/tblSAPLMLSPTC_VIEW/txtESLL-MENGE[4,0]").Text = "1"
+                session.findById("wnd[0]").sendVKey 0
+                session.findById("wnd[0]/usr/subSUB0:SAPLMEGUI:0019/subSUB3:SAPLMEVIEWS:1100/subSUB2:SAPLMEVIEWS:1200/subSUB1:SAPLMEGUI:1301/subSUB2:SAPLMEGUI:1303/tabsITEM_DETAIL/tabpTABIDT1/ssubTABSTRIPCONTROL1SUB:SAPLMEGUI:1328/subSUB0:SAPLMLSP:0400/tblSAPLMLSPTC_VIEW/txtESLL-TBTWR[6,0]").Text = valor
+                session.findById("wnd[0]").sendVKey 0
+                session.findById("wnd[1]/usr/subKONTBLOCK:SAPLKACB:1101/ctxtCOBL-KOSTL").Text = ceco
+                session.findById("wnd[1]").sendVKey 0
+                session.findById("wnd[0]").sendVKey 0
+                
+                session.findById("wnd[0]/usr/subSUB0:SAPLMEGUI:0019/subSUB3:SAPLMEVIEWS:1100/subSUB2:SAPLMEVIEWS:1200/subSUB1:SAPLMEGUI:1301/subSUB2:SAPLMEGUI:1303/tabsITEM_DETAIL/tabpTABIDT7").Select
+                session.findById("wnd[0]/usr/subSUB0:SAPLMEGUI:0015/subSUB3:SAPLMEVIEWS:1100/subSUB2:SAPLMEVIEWS:1200/subSUB1:SAPLMEGUI:1301/subSUB2:SAPLMEGUI:1303/tabsITEM_DETAIL/tabpTABIDT7/ssubTABSTRIPCONTROL1SUB:SAPLMEGUI:1317/ctxtMEPO1317-MWSKZ").Text = "c1"
+                session.findById("wnd[0]/usr/subSUB0:SAPLMEGUI:0015/subSUB3:SAPLMEVIEWS:1100/subSUB2:SAPLMEVIEWS:1200/subSUB1:SAPLMEGUI:1301/subSUB2:SAPLMEGUI:1303/tabsITEM_DETAIL/tabpTABIDT7/ssubTABSTRIPCONTROL1SUB:SAPLMEGUI:1317/ctxtMEPO1317-MWSKZ").SetFocus
+                
+                session.findById("wnd[0]").sendVKey 0
+                session.findById("wnd[0]/usr/subSUB0:SAPLMEGUI:0015/subSUB3:SAPLMEVIEWS:1100/subSUB2:SAPLMEVIEWS:1200/subSUB1:SAPLMEGUI:1301/subSUB2:SAPLMEGUI:1303/tabsITEM_DETAIL/tabpTABIDT8").Select
+                session.findById("wnd[0]/usr/subSUB0:SAPLMEGUI:0019/subSUB3:SAPLMEVIEWS:1100/subSUB2:SAPLMEVIEWS:1200/subSUB1:SAPLMEGUI:1301/subSUB2:SAPLMEGUI:1303/tabsITEM_DETAIL/tabpTABIDT8/ssubTABSTRIPCONTROL1SUB:SAPLMEGUI:1333/ssubSUB0:SAPLV69A:6201/tblSAPLV69ATCTRL_KONDITIONEN/ctxtKOMV-KSCHL[1,4]").Text = "ZIVC"
+                
+                session.findById("wnd[0]").sendVKey 0
+                session.findById("wnd[0]/tbar[0]/btn[11]").press
+                
+                'trae info de barra status
+                Status = session.findById("wnd[0]/sbar").Text
+                objsheet.Cells(irow, 9) = Right(Status, 10)
+                ActiveWorkbook.Save
+                
+                itemcount = itemcount + 1
+                objsheet.Cells(9, 1) = itemcount & " /// " & itemmax
+        
+        Else: itemcount = itemcount + 1
+                objsheet.Cells(9, 1) = itemcount & " /// " & itemmax
+        End If
+
+Next
+MsgBox "Ordenes creadas con suceso"
+
+End Sub
+       
